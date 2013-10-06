@@ -21,9 +21,9 @@ class timer:
     def stop(self):
         self.stopped.set()
         
-    def makeGraph (avgPowers):                                          # takes as input a list of powers   
+    def makeGraph (avgPowers):                                          # takes as input a list of powers eg: [4.2, 7.9, 8.6]  
 	bar_chart = pygal.Bar()                                            # create a bar graph object
-	bar_chart.add('Power', avgPowers)  
+	bar_chart.add('Power (in J)', avgPowers)   
 	bar_chart.render_to_file('Power_bar_chart.svg')
 	os.system("start "+'Power_bar_chart.svg')
 
