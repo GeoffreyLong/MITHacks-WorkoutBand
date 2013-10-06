@@ -7,53 +7,33 @@ int incomingByte =0;
 int ledPin = 13;
 
 
-void setup() 
-{
-  pinMode(ledPin, OUTPUT);
-  Serial.begin(115200);
-//  
-  // Try to initialise and warn if we couldn't detect the chip
-  if (!lsm.begin())
-  {
-    Serial.println("Oops ... unable to initialize the LSM303. Check your wiring!");
-    while (1);
-  }
-// // pinMode(13, OUTPUT);
+void setup(){
+	pinMode(ledPin, OUTPUT);
+	Serial.begin(115200);
+	// Try to initialise and warn if we couldn't detect the chip
+	if (!lsm.begin()){
+		Serial.println("Oops ... unable to initialize the LSM303. Check your wiring!");
+		while (1);
+	}
+	// // pinMode(13, OUTPUT);
 }
 
-void loop() 
-{
-  
-    lsm.read();
-    
-    //Serial.println('s');
-//    Serial.println(lsm.accelData.x);
-//    Serial.println(lsm.accelData.y);
-//    Serial.println(lsm.accelData.z);
-    //double magnitude = sqrt(sq(lsm.accelData.x)+sq(lsm.accelData.y)+sq(lsm.accelData.z)); // test
-    //Serial.println(magnitude); // test
-    Serial.println(lsm.magData.x);
-    Serial.println(lsm.magData.y);
-    Serial.println(lsm.magData.z);
-    if (Serial.available() > 0) {
- // read the incoming byte:
- incomingByte = Serial.read();
- if (incomingByte==49)
- {
-   digitalWrite(ledPin, HIGH);
- }
- else if (incomingByte==48)
- {
-   digitalWrite(ledPin, LOW);
- }
-    //char LED = Serial.read();
-   //Serial.println(LED);
-//    if (LED==0)
-//    {
-//      digitalWrite(13, HIGH);
-//    }
-//    else {
-//      digitalWrite(13, LOW);
-//    }
-    delay(600);
-    }}
+void loop(){
+	lsm.read();
+	dtostrf(lsm.accelData.x,DIGITS,PRECISION,X);
+	dtostrf(lsm.accelData.y,DIGITS,PRECISION,Y);
+	dtostrf(lsm.accelData.z,DIGITS,PRECISION,Z);
+	sprintf(DATA, "(%s,%s,%s)",X,Y,Z);
+	Serial.println(DATA);
+	delay(10);
+	if (Serial.available() > 0) {
+		// read the incoming byte:
+		incomingByte = Serial.read();
+		if (incomingByte==49){
+			digitalWrite(ledPin, HIGH);
+		}
+		else if (incomingByte==48){
+			digitalWrite(ledPin, LOW);	
+		}
+	}
+}
