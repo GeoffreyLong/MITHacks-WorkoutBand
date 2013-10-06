@@ -48,7 +48,7 @@ class initial:
 
     def timeIn(self):
         while (self.sameCount < 50):
-            time.sleep(0.03);
+            time.sleep(0.04);
             print(self.sameCount)
             vals = self.readValues();
             try:
@@ -64,9 +64,12 @@ class initial:
         
     def timeOut(self):
         while (self.sameCount < 50):
-            time.sleep(0.03);
+            time.sleep(0.04);
             vals = self.readValues();
-            valAvg = ((vals[0]+vals[1]+vals[2])/3)
+            try:
+                valAvg = ((vals[0]+vals[1]+vals[2])/3)
+            except Exception:
+                self.readValues()
             if (valAvg <= (abs(self.valPrev + 30))):
                 self.sameCount += 1
             valPrev = valAvg
