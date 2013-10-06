@@ -54,7 +54,7 @@ class arduino(threading.Thread):
     
     def run(self):
         while (self.isRunning == True):
-            threading.Event().wait(0.005)
+            threading.Event().wait(1)
             print self.readValues()
             
     def stop(self):
