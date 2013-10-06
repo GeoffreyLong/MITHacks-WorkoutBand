@@ -1,5 +1,6 @@
 from Tkinter import *
 import tkFont
+import InitializeAccel
 
 
 class Example(Frame):
@@ -13,8 +14,9 @@ class Example(Frame):
         self.parent.title("Weight Bands")
 
 def initializeNext(): 
-    print optionVar.get()
-    print text.get()
+    workout = optionVar.get()
+    weight = text.get()
+    InitializeAccel.initial(workout, weight)
 
 def main():
     root.geometry("300x300+300+40")
