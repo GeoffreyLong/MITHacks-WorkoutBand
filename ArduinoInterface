@@ -1,39 +1,54 @@
-#include <Wire.h>
 #include <Adafruit_LSM303.h>
+#include <Wire.h>
+#include <stdio.h>
+#include <math.h>
 
 Adafruit_LSM303 lsm;
-
+char DATA[50];
+char X[12];
+char Y[12];
+char Z[12];
+int PRECISION = 4;
+int DIGITS = 8;
 int incomingByte =0;
 int ledPin = 13;
+int initialX = 0;
+int initialY = 0;
+int initialZ = 0;
+int startBool = 0;
 
+void setup() {
+  Serial.begin(115200);
+  pinMode(ledPin, OUTPUT);
+  // Try to initialise and warn if we couldn't detect the chip
+  if (!lsm.begin()){
+    Serial.println("Oops ... unable to initialize the LSM303. Check your wiring!");
+    while (1);
+  }
 
-void setup(){
-	pinMode(ledPin, OUTPUT);
-	Serial.begin(115200);
-	// Try to initialise and warn if we couldn't detect the chip
-	if (!lsm.begin()){
-		Serial.println("Oops ... unable to initialize the LSM303. Check your wiring!");
-		while (1);
-	}
-	// // pinMode(13, OUTPUT);
 }
 
-void loop(){
-	lsm.read();
-	dtostrf(lsm.accelData.x,DIGITS,PRECISION,X);
-	dtostrf(lsm.accelData.y,DIGITS,PRECISION,Y);
-	dtostrf(lsm.accelData.z,DIGITS,PRECISION,Z);
-	sprintf(DATA, "(%s,%s,%s)",X,Y,Z);
-	Serial.println(DATA);
-	delay(10);
-	if (Serial.available() > 0) {
-		// read the incoming byte:
-		incomingByte = Serial.read();
-		if (incomingByte==49){
-			digitalWrite(ledPin, HIGH);
-		}
-		else if (incomingByte==48){
-			digitalWrite(ledPin, LOW);	
-		}
-	}
+
+
+void loop() {
+    lsm.read();
+    if (startBool == 0){
+        initialX = lsm.magData.x;
+        initialY = lsm.magData.y;
+        initialZ = lsm.magData.z;
+        startBool = 1;
+    }
+    dtostrf(lsm.accelData.x,DIGITS,PRECISION,X);
+    dtostrf(lsm.accelData.y,DIGITS,PRECISION,Y);
+    dtostrf(lsm.accelData.z,DIGITS,PRECISION,Z);
+    sprintf(DATA, "[%s,%s,%s]",X,Y,Z);
+    Serial.println(DATA);
+    if (abs(lsm.magData.x - initialX) > 75 || abs(lsm.magData.y - initialY) > 75 || abs(lsm.magData.z - initialZ) > 75){
+	digitalWrite(ledPin, HIGH);
+    }
+    else{
+        digitalWrite(ledPin, LOW);
+    }
+    delay(80);
 }
+
