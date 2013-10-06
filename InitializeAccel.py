@@ -24,18 +24,17 @@ class initial:
         while (self.sameCount < 52):
             time.sleep(0.04);
             vals = passive.readValues();
+            valAvg = 0
             try:
                 valAvg = ((vals[0]+vals[1]+vals[2])/3)
+                if (valAvg <= (abs(self.valPrev + 30))):
+                    self.xAvg = (self.xAvg - vals[0]) / (self.sameCount - 1)
+                    self.yAvg = (self.yAvg - vals[1]) / (self.sameCount - 1)
+                    self.zAvg = (self.zAvg - vals[2]) / (self.sameCount - 1)
+                    self.sameCount += 1
+                self.valPrev = valAvg
             except Exception:
                 passive.readValues()
-            
-            if (valAvg <= (abs(self.valPrev + 30))):
-                self.xAvg = (self.xAvg - vals[0]) / (self.sameCount - 1)
-                self.yAvg = (self.yAvg - vals[1]) / (self.sameCount - 1)
-                self.zAvg = (self.zAvg - vals[2]) / (self.sameCount - 1)
-                self.sameCount += 1
-                
-            self.valPrev = valAvg
         self.timeOut()
         self.sameCount=2
         #have it beep
@@ -44,8 +43,8 @@ class initial:
 #Would be faster for passive        
     def timeOut(self):
         passive = PassiveAccelerometer.arduino(self.xAvg, self.yAvg, self.zAvg)
-        while (self.sameCount < 152):
-            time.sleep(0.010);
+        while (self.sameCount < 50):
+            time.sleep(0.080);
             vals = passive.readValues();
             
             self.data.append(vals)
@@ -55,7 +54,7 @@ class initial:
             except Exception:
                 passive.readValues()
             
-            if (valAvg <= (abs(self.valPrev + 30))):
+            if (valAvg <= (abs(self.valPrev + 300)) or valAvg >= (abs(self.valPrev - 300))):
                 self.sameCount += 1
             valPrev = valAvg
         
