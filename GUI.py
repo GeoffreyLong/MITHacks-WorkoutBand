@@ -27,7 +27,6 @@ def main():
     b.pack()
     root.mainloop()  
     
-#officeresquire
 root = Tk()
 text = Entry(root)
 optionVar = StringVar(root)
