@@ -9,16 +9,14 @@ class timer:
     def __init__(self, workout, weight):
         self.workout = workout
         self.weight = weight
-        self.accel = Accelerometer.arduino(self.workout, self.weight)
-        self.stopped = threading.Event()
+        
+        self.accel = Accelerometer.arduino(self.workout, self.weight, True)
         
     def start(self):
-        self.accel.start()
-        thread = self.accel(self.stopped)
-        thread.start()
+        self.accel().start()
 
     def stop(self):
-        self.stopped.set()
+        self.accel.stop()
         
     def makeGraph (avgPowers):                                                   # First import pygal
 	bar_chart = pygal.Bar()                                            # Makes a simple bar graph of powers eg: avgPowers = [5.2, 2.5, 7.9]
