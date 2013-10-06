@@ -10,6 +10,12 @@ class arduino(threading.Thread):
         self.workout = workout
         self.ser = serial.Serial('/dev/ttyACM0', 115200)
         self.isRunning = isRunning
+        self.maxMag = 0
+        self.lastMag = 0
+        self.lastTime = int(round(time.time() * 1000))
+        self.magV = 0
+        self.avgPower = 0
+        self.avgPowerDataPoints = 2
         
         threading.Thread.__init__(self)
         self.event = threading.Event()
@@ -42,7 +48,7 @@ class arduino(threading.Thread):
         except Exception:
             self.readValues()
             
-    def magnitude(self, vals):
+    def accMagnitude(self, vals):
         normX = vals[0] - self.initial[0]
         normY = vals[1] - self.initial[1]
         normZ = vals[2] - self.initial[2]
@@ -54,17 +60,35 @@ class arduino(threading.Thread):
     
     def run(self):
         while (self.isRunning == True):
-            threading.Event().wait(1)
-            print self.readValues()
+            threading.Event().wait(0.005)
+            
             
     def stop(self):
         self.isRunning = False
   
-#    def maxPower(self, ):
-    
-#    def avgPower(self, ):
-    
-#        connection.magnitude(connection.readValues())
+    def maxAcceleration(self):
+        mag = self.accMagnitude(arduino.readValues())
+        if (mag > self.maxMag):
+            self.maxMag = mag
+            
+    def getMaxAcc(self):
+        return self.maxMag        
 
+#This is very naive and very wrong but I am putting it here anyways     
+       
+    def velocityMagnitude(self):
+        mag = self.accMagnitude(arduino.readValues())
+        deltaT = (self.lastTime - (int(round(time.time() * 1000))))
+        magV = ((mag + self.lastMag)/2) * deltaT
+        self.magV += magV
+        
+    def getMagV(self):
+        return self.magV
+        
+    def avgPower(self):
+        power = self.velocityMagnitude() * self.weight * self.accMagnitude(arduino.readValues())
+        self.avgPower = (self.avgPower - power) / (self.avgPowerDataPoints - 1)
 
+    def getAvgPower(self):
+        return self.avgPower
 
