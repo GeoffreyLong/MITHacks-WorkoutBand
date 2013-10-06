@@ -3,6 +3,7 @@ import math
 import ast
 import Accelerometer
 import TimeOut
+import time
 
 class initial:
     def __init__(self, weight, workout):
@@ -47,6 +48,7 @@ class initial:
 
     def timeIn(self):
         while (self.sameCount < 50):
+            time.sleep(0.03);
             print(self.sameCount)
             vals = self.readValues();
             try:
@@ -58,9 +60,11 @@ class initial:
             self.valPrev = valAvg
         self.timer.start()
         self.sameCount=0
+        self.timeOut()
         
     def timeOut(self):
         while (self.sameCount < 50):
+            time.sleep(0.03);
             vals = self.readValues();
             valAvg = ((vals[0]+vals[1]+vals[2])/3)
             if (valAvg <= (abs(self.valPrev + 30))):
