@@ -52,7 +52,6 @@ def main():
     
     root.mainloop()  
     
-#officeresquire
 root = Tk()
 text = Entry(root, width=8)
 optionVar = StringVar(root)
