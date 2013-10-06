@@ -12,7 +12,6 @@ class timer:
         
     def start(self):
         self.accel.start()
-        
         thread = self.accel(self.stopped)
         thread.start()
 
