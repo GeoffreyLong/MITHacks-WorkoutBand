@@ -1,5 +1,5 @@
 import os
-import pygal
+import pygal #http://pygal.org/download/
 import threading
 import time
 import threading
