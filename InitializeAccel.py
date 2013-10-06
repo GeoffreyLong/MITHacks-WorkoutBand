@@ -1,77 +1,63 @@
 import serial
-import math
-import ast
-import Accelerometer
-import TimeOut
 import time
+import PassiveAccelerometer
+import DataManipulation
+
 
 class initial:
     def __init__(self, weight, workout):
         self.weight = weight
         self.workout = workout
         self.ser = serial.Serial('/dev/ttyACM0', 115200)
-        self.startBoolean = False;
-        self.sameCount = 0;
+        self.sameCount = 2;
         self.valPrev = 0;
-        self.timer = TimeOut.timer(self.workout, self.weight)
+        self.ser.readline()
+        self.data = []
+        self.xAvg = 0
+        self.yAvg = 0
+        self.zAvg = 0
         
-        self.ser.readline()
-        self.ser.readline()
-        isInitialized = False
-        while(isInitialized == False):
-            try:
-                valArray = self.ser.readline()
-                initialStrings = ast.literal_eval(valArray)
-                self.x = float(initialStrings[0])
-                self.y = float(initialStrings[1])
-                self.z = float(initialStrings[2])
-                if (initialStrings.__contains__(None)):
-                    isInitialized = False
-                else:
-                    isInitialized = True
-            except Exception:
-                isInitialized = False
-                pass
         self.timeIn()
         
-    def readValues(self):
-        try:
-            dic = self.ser.readline()
-            valStrings = ast.literal_eval(dic)
-            vals = [float(valStrings[0]), float(valStrings[1]), float(valStrings[2])]
-            if (valStrings.__contains__(None)):
-                self.readValues()
-            else:
-                return vals
-        except Exception:
-            self.readValues()
-
     def timeIn(self):
-        while (self.sameCount < 50):
+        passive = PassiveAccelerometer.arduino(0.0,0.0,0.0)
+        while (self.sameCount < 52):
             time.sleep(0.04);
-            print(self.sameCount)
-            vals = self.readValues();
+            vals = passive.readValues();
             try:
                 valAvg = ((vals[0]+vals[1]+vals[2])/3)
             except Exception:
-                self.readValues()
+                passive.readValues()
+            
             if (valAvg <= (abs(self.valPrev + 30))):
+                self.xAvg = (self.xAvg - vals[0]) / (self.sameCount - 1)
+                self.yAvg = (self.yAvg - vals[1]) / (self.sameCount - 1)
+                self.zAvg = (self.zAvg - vals[2]) / (self.sameCount - 1)
                 self.sameCount += 1
+                
             self.valPrev = valAvg
-        self.timer.start()
-        self.sameCount=0
         self.timeOut()
-        
+        self.sameCount=2
+        #have it beep
+
+#could get rid of the threading and make this the timeout
+#Would be faster for passive        
     def timeOut(self):
-        while (self.sameCount < 50):
-            time.sleep(0.04);
-            vals = self.readValues();
+        passive = PassiveAccelerometer.arduino(self.xAvg, self.yAvg, self.zAvg)
+        while (self.sameCount < 152):
+            time.sleep(0.010);
+            vals = passive.readValues();
+            
+            self.data.append(vals)
+            
             try:
                 valAvg = ((vals[0]+vals[1]+vals[2])/3)
             except Exception:
-                self.readValues()
+                passive.readValues()
+            
             if (valAvg <= (abs(self.valPrev + 30))):
                 self.sameCount += 1
             valPrev = valAvg
-        self.timer.stop()
+        
+        manip = DataManipulation.simpleFunctions(self.data, self.weight, self.workout)
 #NOTER :: WHAT TO DO NEXT?
