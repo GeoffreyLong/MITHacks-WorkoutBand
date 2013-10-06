@@ -1,15 +1,15 @@
 import serial
 import math
 import ast
-import GUI
 import threading
 import time
 
 class arduino(threading.Thread):
-    def __init__(self, weight, workout, event):
+    def __init__(self, weight, workout, isRunning):
         self.weight = weight
         self.workout = workout
-        self.ser = serial.Serial('/dev/ttyACM1', 115200)
+        self.ser = serial.Serial('/dev/ttyACM0', 115200)
+        self.isRunning = isRunning
         
         threading.Thread.__init__(self)
         self.event = threading.Event()
@@ -53,11 +53,12 @@ class arduino(threading.Thread):
         return mag
     
     def run(self):
-        while not self.stopped.wait(0.005):
-            print (self.readValues())
+        while (self.isRunning == True):
+            threading.Event().wait(0.005)
+            print self.readValues()
             
-        
-    
+    def stop(self):
+        self.isRunning = False
   
 #    def maxPower(self, ):
     
