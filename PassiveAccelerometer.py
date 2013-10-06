@@ -23,6 +23,7 @@ class arduino(threading.Thread):
             if (valStrings.__contains__(None)):
                 self.readValues()
             else:
+                print vals
                 return vals
         except Exception:
             self.readValues()
