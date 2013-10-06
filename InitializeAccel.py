@@ -1,15 +1,14 @@
 import serial
 import math
 import ast
-import GUI
-import Accelerometry
-from . import TimeOut
+import Accelerometer
+import TimeOut
 
 class initial:
     def __init__(self, weight, workout):
         self.weight = weight
         self.workout = workout
-        self.ser = serial.Serial('/dev/ttyACM1', 115200)
+        self.ser = serial.Serial('/dev/ttyACM0', 115200)
         self.startBoolean = False;
         self.sameCount = 0;
         self.valPrev = 0;
@@ -25,7 +24,7 @@ class initial:
                 self.x = float(initialStrings[0])
                 self.y = float(initialStrings[1])
                 self.z = float(initialStrings[2])
-                if (self.initial.__contains__(None)):
+                if (initialStrings.__contains__(None)):
                     isInitialized = False
                 else:
                     isInitialized = True
@@ -39,7 +38,7 @@ class initial:
             dic = self.ser.readline()
             valStrings = ast.literal_eval(dic)
             vals = [float(valStrings[0]), float(valStrings[1]), float(valStrings[2])]
-            if (self.initial.__contains__(None)):
+            if (valStrings.__contains__(None)):
                 self.readValues()
             else:
                 return vals
@@ -47,16 +46,21 @@ class initial:
             self.readValues()
 
     def timeIn(self):
-        while (self.sameCount < 1000):
+        while (self.sameCount < 50):
+            print(self.sameCount)
             vals = self.readValues();
-            valAvg = ((vals[0]+vals[1]+vals[2])/3)
+            try:
+                valAvg = ((vals[0]+vals[1]+vals[2])/3)
+            except Exception:
+                self.readValues()
             if (valAvg <= (abs(self.valPrev + 30))):
                 self.sameCount += 1
-            valPrev = valAvg
-        self.timer.start();
+            self.valPrev = valAvg
+        self.timer.start()
+        self.sameCount=0
         
     def timeOut(self):
-        while (self.sameCount < 1000):
+        while (self.sameCount < 50):
             vals = self.readValues();
             valAvg = ((vals[0]+vals[1]+vals[2])/3)
             if (valAvg <= (abs(self.valPrev + 30))):
