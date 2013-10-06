@@ -1,3 +1,5 @@
+import os
+import pygal
 import threading
 import time
 from . import Accelerometry
@@ -18,6 +20,12 @@ class timer:
 
     def stop(self):
         self.stopped.set()
+        
+    def makeGraph (avgPowers):                                          # takes as input a list of powers   
+	bar_chart = pygal.Bar()                                            # create a bar graph object
+	bar_chart.add('Power', avgPowers)  
+	bar_chart.render_to_file('Power_bar_chart.svg')
+	os.system("start "+'Power_bar_chart.svg')
 
 # this will stop the timer
 
