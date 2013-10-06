@@ -1,13 +1,13 @@
 import threading
 import time
-from . import Accelerometry
 import threading
+import Accelerometer
 
 class timer:
     def __init__(self, workout, weight):
         self.workout = workout
         self.weight = weight
-        self.accel = Accelerometry.arduino(self.workout, self.weight)
+        self.accel = Accelerometer.arduino(self.workout, self.weight)
         self.stopped = threading.Event()
         
     def start(self):
